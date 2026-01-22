@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  transaction_date: 2026-01-22 22:34:11
+  status: MyString
+  price: 9.99
+  charge_status: MyString
+
+two:
+  transaction_date: 2026-01-22 22:34:11
+  status: MyString
+  price: 9.99
+  charge_status: MyString
