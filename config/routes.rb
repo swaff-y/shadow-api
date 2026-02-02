@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :companies
+  resources :natural_people
   resources :lead_entities
   resources :transactions
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

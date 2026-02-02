@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  company_number: MyString
+  docs_s3_folder: MyString
+
+two:
+  name: MyString
+  company_number: MyString
+  docs_s3_folder: MyString
