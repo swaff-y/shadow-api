@@ -55,9 +55,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_090621) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "transaction_sessions", force: :cascade do |t|
+  create_table "transaction_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.jsonb "data", default: {}, null: false
+    t.datetime "expires_at", null: false
+    t.string "source_app"
+    t.string "transaction_type", null: false
     t.datetime "updated_at", null: false
+    t.boolean "used", default: false, null: false
+    t.index ["expires_at"], name: "index_transaction_sessions_on_expires_at"
+    t.index ["used"], name: "index_transaction_sessions_on_used"
   end
 
   create_table "transactions", force: :cascade do |t|
