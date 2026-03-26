@@ -28,9 +28,9 @@ company_2 = Company.create!(name: "Pacific Property Group", abn: "98765432109", 
 puts "Created #{Company.count} companies"
 
 # --- Users ---
-user_1 = User.create!(email: "alice@smithlegal.com.au", role: "admin", company: company_1)
-user_2 = User.create!(email: "bob@smithlegal.com.au", role: "user", company: company_1)
-user_3 = User.create!(email: "carol@pacificproperty.com.au", role: "admin", company: company_2)
+user_1 = User.create!(email: "alice@smithlegal.com.au", role: "company_admin", company: company_1)
+user_2 = User.create!(email: "bob@smithlegal.com.au", role: "agent", company: company_1)
+user_3 = User.create!(email: "carol@pacificproperty.com.au", role: "company_admin", company: company_2)
 
 puts "Created #{User.count} users"
 
