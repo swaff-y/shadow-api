@@ -1,13 +1,14 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  transaction_date: 2026-01-22 22:34:11
-  status: MyString
-  price: 9.99
-  charge_status: MyString
+  type: StandardTransaction
+  status: pending
+  user: one
+  partyable: one (Entity)
+  property_address: 123 Main St
 
 two:
-  transaction_date: 2026-01-22 22:34:11
-  status: MyString
-  price: 9.99
-  charge_status: MyString
+  type: PropertyTransaction
+  status: completed
+  user: two
+  property_address: 456 Oak Ave
