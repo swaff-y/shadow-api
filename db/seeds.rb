@@ -2,171 +2,145 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
-# Clear existing records
-Transaction.destroy_all
-LeadEntity.destroy_all
-Kyc.destroy_all
-Voi.destroy_all
+# Clear existing records (order matters for foreign keys)
+TrustRole.destroy_all
+Director.destroy_all
+Shareholder.destroy_all
+Ubo.destroy_all
+Document.destroy_all
+RiskAssessment.destroy_all
 Kyb.destroy_all
-NaturalPerson.destroy_all
+Kyc.destroy_all
+PepStatus.destroy_all
+Voi.destroy_all
+Cdd.destroy_all
+Buyer.destroy_all
+Seller.destroy_all
+Transaction.destroy_all
+Entity.destroy_all
+User.destroy_all
 Company.destroy_all
 
-# Create Natural Persons with KYC and VOI
-natural_person_1 = NaturalPerson.create!(
-  first_name: "John",
-  last_name: "Doe",
-  dob: Date.new(1985, 6, 15),
-  docs_s3_folder: "s3://docs/natural-persons/john-doe"
-)
-Kyc.create!(natural_person: natural_person_1)
-Voi.create!(natural_person: natural_person_1)
+# --- Companies ---
+company_1 = Company.create!(name: "Smith & Associates Legal", abn: "12345678901", status: "active")
+company_2 = Company.create!(name: "Pacific Property Group", abn: "98765432109", status: "active")
 
-natural_person_2 = NaturalPerson.create!(
-  first_name: "Jane",
-  last_name: "Smith",
-  dob: Date.new(1990, 3, 22),
-  docs_s3_folder: "s3://docs/natural-persons/jane-smith"
-)
-Kyc.create!(natural_person: natural_person_2)
-Voi.create!(natural_person: natural_person_2)
+puts "Created #{Company.count} companies"
 
-natural_person_3 = NaturalPerson.create!(
-  first_name: "Michael",
-  last_name: "Johnson",
-  dob: Date.new(1978, 11, 8),
-  docs_s3_folder: "s3://docs/natural-persons/michael-johnson"
-)
-Kyc.create!(natural_person: natural_person_3)
-Voi.create!(natural_person: natural_person_3)
+# --- Users ---
+user_1 = User.create!(email: "alice@smithlegal.com.au", role: "company_admin", company: company_1)
+user_2 = User.create!(email: "bob@smithlegal.com.au", role: "agent", company: company_1)
+user_3 = User.create!(email: "carol@pacificproperty.com.au", role: "company_admin", company: company_2)
 
-puts "Created #{NaturalPerson.count} natural persons with KYC and VOI records"
+puts "Created #{User.count} users"
 
-# Create Companies with KYB
-company_1 = Company.create!(
-  name: "Tech Innovations Inc",
-  company_number: "ACN123456789",
-  docs_s3_folder: "s3://docs/companies/tech-innovations"
-)
-Kyb.create!(company: company_1)
+# --- Entities ---
+individual_1 = Individual.create!(first_name: "James", last_name: "Wilson", name: "James Wilson", status: "active", risk_rating: "low", date_of_birth: Date.new(1985, 3, 15))
+individual_2 = Individual.create!(first_name: "Sarah", last_name: "Chen", name: "Sarah Chen", status: "active", risk_rating: "medium", date_of_birth: Date.new(1990, 7, 22))
+individual_3 = Individual.create!(first_name: "Michael", last_name: "O'Brien", name: "Michael O'Brien", status: "active", risk_rating: "low", date_of_birth: Date.new(1978, 11, 8))
+individual_4 = Individual.create!(first_name: "Lisa", last_name: "Nguyen", name: "Lisa Nguyen", status: "pending", risk_rating: "high", date_of_birth: Date.new(1992, 1, 30))
 
-company_2 = Company.create!(
-  name: "Global Trading Ltd",
-  company_number: "ACN987654321",
-  docs_s3_folder: "s3://docs/companies/global-trading"
-)
-Kyb.create!(company: company_2)
+business_1 = Business.create!(name: "Oceanic Imports Pty Ltd", abn: "11223344556", registration_number: "ACN111222333", status: "active", risk_rating: "medium")
+business_2 = Business.create!(name: "GreenTech Solutions", abn: "66554433221", registration_number: "ACN444555666", status: "active", risk_rating: "low")
 
-puts "Created #{Company.count} companies with KYB records"
+trust_1 = Trust.create!(name: "Wilson Family Trust", trust_type: "discretionary", status: "active", risk_rating: "low")
 
-# Create Lead Entities with polymorphic associations
-lead_entity_1 = LeadEntity.create!(
-  entity: natural_person_1,
-  lead_entity_kind: "naturalPerson",
-  status: "complete"
-)
+partnership_1 = Partnership.create!(name: "Chen & O'Brien Partners", status: "active", risk_rating: "medium")
 
-lead_entity_2 = LeadEntity.create!(
-  entity: company_1,
-  lead_entity_kind: "Company",
-  status: "in-progress"
-)
+puts "Created #{Entity.count} entities (#{Individual.count} individuals, #{Business.count} businesses, #{Trust.count} trusts, #{Partnership.count} partnerships)"
 
-lead_entity_3 = LeadEntity.create!(
-  entity: natural_person_2,
-  lead_entity_kind: "naturalPerson",
-  status: "started"
-)
+# --- Compliance: CDD ---
+Cdd.create!(entity: individual_1)
+Cdd.create!(entity: individual_2)
+Cdd.create!(entity: business_1)
+Cdd.create!(entity: trust_1)
 
-lead_entity_4 = LeadEntity.create!(
-  entity: company_2,
-  lead_entity_kind: "Company",
-  status: "complete"
-)
+puts "Created #{Cdd.count} CDD records"
 
-lead_entity_5 = LeadEntity.create!(
-  entity: natural_person_3,
-  lead_entity_kind: "naturalPerson",
-  status: "abandoned"
-)
+# --- Compliance: VOI (Individual only) ---
+Voi.create!(entity: individual_1)
+Voi.create!(entity: individual_2)
+Voi.create!(entity: individual_3)
 
-puts "Created #{LeadEntity.count} lead entities"
+puts "Created #{Voi.count} VOI records"
 
-# Seed 10 transactions
-transactions = [
-  {
-    transaction_date: DateTime.new(2026, 1, 15, 10, 30, 0),
-    status: "completed",
-    price: 150.00,
-    charge_status: "paid",
-    lead_entity: lead_entity_1
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 16, 14, 45, 0),
-    status: "pending",
-    price: 275.50,
-    charge_status: "pending",
-    lead_entity: lead_entity_2
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 17, 9, 0, 0),
-    status: "completed",
-    price: 89.99,
-    charge_status: "paid",
-    lead_entity: lead_entity_1
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 18, 16, 20, 0),
-    status: "failed",
-    price: 450.00,
-    charge_status: "declined",
-    lead_entity: lead_entity_3
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 19, 11, 15, 0),
-    status: "completed",
-    price: 32.50,
-    charge_status: "paid",
-    lead_entity: lead_entity_4
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 20, 8, 30, 0),
-    status: "pending",
-    price: 199.99,
-    charge_status: "pending",
-    lead_entity: lead_entity_2
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 20, 13, 45, 0),
-    status: "completed",
-    price: 75.00,
-    charge_status: "paid",
-    lead_entity: lead_entity_5
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 21, 10, 0, 0),
-    status: "refunded",
-    price: 125.00,
-    charge_status: "refunded",
-    lead_entity: lead_entity_3
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 21, 15, 30, 0),
-    status: "completed",
-    price: 599.99,
-    charge_status: "paid",
-    lead_entity: lead_entity_4
-  },
-  {
-    transaction_date: DateTime.new(2026, 1, 22, 9, 15, 0),
-    status: "pending",
-    price: 45.00,
-    charge_status: "pending",
-    lead_entity: lead_entity_1
-  }
-]
+# --- Compliance: PEP Status (Individual only) ---
+PepStatus.create!(entity: individual_1)
+PepStatus.create!(entity: individual_4)
 
-transactions.each do |transaction_data|
-  Transaction.create!(transaction_data)
-end
+puts "Created #{PepStatus.count} PEP status records"
 
-puts "Created #{Transaction.count} transactions"
+# --- Compliance: KYC (Individual only) ---
+Kyc.create!(entity: individual_1)
+Kyc.create!(entity: individual_2)
+
+puts "Created #{Kyc.count} KYC records"
+
+# --- Compliance: KYB (Business only) ---
+Kyb.create!(entity: business_1)
+Kyb.create!(entity: business_2)
+
+puts "Created #{Kyb.count} KYB records"
+
+# --- Risk Assessments ---
+RiskAssessment.create!(entity: individual_1)
+RiskAssessment.create!(entity: business_1)
+RiskAssessment.create!(entity: trust_1)
+
+puts "Created #{RiskAssessment.count} risk assessments"
+
+# --- Documents ---
+Document.create!(entity: individual_1)
+Document.create!(entity: individual_2)
+Document.create!(entity: business_1)
+
+puts "Created #{Document.count} documents"
+
+# --- UBO (Business only) ---
+ubo_1 = Ubo.create!(entity: business_1)
+ubo_2 = Ubo.create!(entity: business_2)
+
+puts "Created #{Ubo.count} UBOs"
+
+# --- Shareholders ---
+Shareholder.create!(ubo: ubo_1, shareholdable: individual_1, percentage: 60.0)
+Shareholder.create!(ubo: ubo_1, shareholdable: individual_2, percentage: 40.0)
+Shareholder.create!(ubo: ubo_2, shareholdable: business_1, percentage: 100.0)
+
+puts "Created #{Shareholder.count} shareholders"
+
+# --- Directors ---
+Director.create!(ubo: ubo_1, individual: individual_1)
+Director.create!(ubo: ubo_1, individual: individual_3)
+Director.create!(ubo: ubo_2, individual: individual_2)
+
+puts "Created #{Director.count} directors"
+
+# --- Trust Roles ---
+TrustRole.create!(trust: trust_1, individual: individual_1, role: "settlor")
+TrustRole.create!(trust: trust_1, individual: individual_3, role: "trustee")
+TrustRole.create!(trust: trust_1, individual: individual_2, role: "beneficiary")
+
+puts "Created #{TrustRole.count} trust roles"
+
+# --- Transactions ---
+# Standard transactions
+StandardTransaction.create!(user: user_1, status: "completed", partyable: individual_1)
+StandardTransaction.create!(user: user_2, status: "pending", partyable: business_1)
+StandardTransaction.create!(user: user_1, status: "completed", partyable: individual_2)
+
+# Property transactions
+pt_1 = PropertyTransaction.create!(user: user_3, status: "in_progress", property_address: "42 Harbour St, Sydney NSW 2000")
+pt_2 = PropertyTransaction.create!(user: user_1, status: "completed", property_address: "15 Collins St, Melbourne VIC 3000")
+
+Seller.create!(property_transaction: pt_1, partyable: individual_1)
+Buyer.create!(property_transaction: pt_1, partyable: business_1)
+Buyer.create!(property_transaction: pt_1, partyable: individual_4)
+
+Seller.create!(property_transaction: pt_2, partyable: trust_1)
+Buyer.create!(property_transaction: pt_2, partyable: individual_3)
+
+puts "Created #{Transaction.count} transactions (#{StandardTransaction.count} standard, #{PropertyTransaction.count} property)"
+puts "Created #{Seller.count} sellers, #{Buyer.count} buyers"
+
+puts "\nSeed complete!"

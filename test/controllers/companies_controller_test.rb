@@ -12,7 +12,7 @@ class CompaniesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create company" do
     assert_difference("Company.count") do
-      post companies_url, params: { company: { company_number: @company.company_number, docs_s3_folder: @company.docs_s3_folder, name: @company.name } }, as: :json
+      post companies_url, params: { company: { name: "New Corp", abn: "99988877766", status: "active" } }, as: :json
     end
 
     assert_response :created
@@ -24,13 +24,14 @@ class CompaniesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update company" do
-    patch company_url(@company), params: { company: { company_number: @company.company_number, docs_s3_folder: @company.docs_s3_folder, name: @company.name } }, as: :json
+    patch company_url(@company), params: { company: { name: @company.name, abn: @company.abn, status: @company.status } }, as: :json
     assert_response :success
   end
 
   test "should destroy company" do
+    company = Company.create!(name: "Deletable Corp", abn: "00000000000", status: "active")
     assert_difference("Company.count", -1) do
-      delete company_url(@company), as: :json
+      delete company_url(company), as: :json
     end
 
     assert_response :no_content

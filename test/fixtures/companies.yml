@@ -1,11 +1,11 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  company_number: MyString
-  docs_s3_folder: MyString
+  name: Acme Corp
+  abn: "12345678901"
+  status: active
 
 two:
-  name: MyString
-  company_number: MyString
-  docs_s3_folder: MyString
+  name: Beta Inc
+  abn: "98765432109"
+  status: trial

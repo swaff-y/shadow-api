@@ -1,3 +1,3 @@
 class Kyb < ApplicationRecord
-  belongs_to :company
+  belongs_to :entity
 end

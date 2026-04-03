@@ -1,3 +1,4 @@
 class Transaction < ApplicationRecord
-  belongs_to :lead_entity, optional: true
+  belongs_to :user
+  # STI: type column differentiates StandardTransaction and PropertyTransaction
 end

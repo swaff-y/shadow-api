@@ -1,3 +1,3 @@
 class Voi < ApplicationRecord
-  belongs_to :natural_person
+  belongs_to :entity
 end

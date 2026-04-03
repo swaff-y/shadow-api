@@ -1,0 +1,2 @@
+class Partnership < Entity
+end

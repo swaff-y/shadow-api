@@ -1,7 +1,8 @@
 class Company < ApplicationRecord
-  include Entityable
+  has_many :users
 
-  has_one :kyb, dependent: :destroy
+  enum :status, { active: "active", trial: "trial", suspended: "suspended", cancelled: "cancelled" }
 
   validates :name, presence: true
+  validates :status, presence: true
 end
